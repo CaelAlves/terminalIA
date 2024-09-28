@@ -1,0 +1,157 @@
+<html>
+<head>
+  <base href="https://chatcaelia.com/">  <!-- Define a URL base para links relativos. -->
+  <title>Cael-ia Chatbot Interface</title>  <!-- Título da página exibido na aba do navegador. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- Define o viewport para responsividade em dispositivos móveis. -->
+  <style>
+    body {  /* Estilo para o corpo da página. */
+      font-family: Arial, sans-serif;  /* Define a fonte do corpo. */
+      background-color: #f0f0f0;  /* Define a cor de fundo. */
+      margin: 0;  /* Remove a margem padrão. */
+      padding: 0;  /* Remove o preenchimento padrão. */
+      display: flex;  /* Usa flexbox para layout. */
+      justify-content: center;  /* Centraliza horizontalmente. */
+      align-items: center;  /* Centraliza verticalmente. */
+      min-height: 100vh;  /* Define a altura mínima como 100% da altura da tela. */
+    }
+    
+    #chat-container {  /* Estilo do contêiner de chat. */
+      background-color: white;  /* Cor de fundo branca. */
+      border-radius: 10px;  /* Bordas arredondadas. */
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);  /* Sombra sutil. */
+      width: 100%;  /* Largura total. */
+      max-width: 500px;  /* Largura máxima de 500px. */
+      display: flex;  /* Usa flexbox. */
+      flex-direction: column;  /* Organiza filhos em coluna. */
+      height: 100vh;  /* Altura total da tela. */
+    }
+    
+    #chat-header {  /* Estilo do cabeçalho do chat. */
+      background-color: #4a90e2;  /* Cor de fundo azul. */
+      color: white;  /* Cor do texto branco. */
+      padding: 15px;  /* Preenchimento interno. */
+      border-top-left-radius: 10px;  /* Bordas arredondadas no canto superior esquerdo. */
+      border-top-right-radius: 10px;  /* Bordas arredondadas no canto superior direito. */
+      text-align: center;  /* Centraliza o texto. */
+    }
+    
+    #chat-header h1 {  /* Estilo do título no cabeçalho. */
+      margin: 0;  /* Remove a margem padrão. */
+      font-size: 1.5rem;  /* Tamanho da fonte do título. */
+    }
+    
+    #chat-area {  /* Estilo da área de chat onde as mensagens aparecem. */
+      flex-grow: 1;  /* Permite que a área cresça para preencher o espaço disponível. */
+      overflow-y: auto;  /* Permite rolagem vertical. */
+      padding: 15px;  /* Preenchimento interno. */
+      display: flex;  /* Usa flexbox. */
+      flex-direction: column;  /* Organiza as mensagens em coluna. */
+    }
+    
+    .message {  /* Estilo para mensagens. */
+      max-width: 80%;  /* Largura máxima das mensagens. */
+      margin-bottom: 10px;  /* Margem inferior. */
+      padding: 8px 12px;  /* Preenchimento interno. */
+      border-radius: 18px;  /* Bordas arredondadas. */
+      line-height: 1.4;  /* Altura da linha. */
+      font-size: 0.9rem;  /* Tamanho da fonte. */
+    }
+    
+    .user-message {  /* Estilo para mensagens do usuário. */
+      align-self: flex-end;  /* Alinha à direita. */
+      background-color: #e3f2fd;  /* Cor de fundo clara. */
+    }
+    
+    .bot-message {  /* Estilo para mensagens do bot. */
+      align-self: flex-start;  /* Alinha à esquerda. */
+      background-color: #f0f0f0;  /* Cor de fundo neutra. */
+    }
+    
+    #input-area {  /* Estilo da área de entrada de texto. */
+      display: flex;  /* Usa flexbox. */
+      padding: 10px;  /* Preenchimento interno. */
+      border-top: 1px solid #e0e0e0;  /* Borda superior. */
+    }
+    
+    #user-input {  /* Estilo do campo de entrada de texto. */
+      flex-grow: 1;  /* Permite que o campo cresça. */
+      padding: 10px;  /* Preenchimento interno. */
+      border: 1px solid #ccc;  /* Borda cinza. */
+      border-radius: 20px;  /* Bordas arredondadas. */
+      font-size: 16px;  /* Tamanho da fonte. */
+    }
+    
+    #send-button {  /* Estilo do botão de enviar. */
+      background-color: #4a90e2;  /* Cor de fundo azul. */
+      color: white;  /* Cor do texto branca. */
+      border: none;  /* Sem borda. */
+      padding: 10px;  /* Preenchimento interno. */
+      margin-left: 10px;  /* Margem à esquerda. */
+      border-radius: 50%;  /* Botão redondo. */
+      cursor: pointer;  /* Muda o cursor ao passar o mouse. */
+      font-size: 16px;  /* Tamanho da fonte. */
+      width: 40px;  /* Largura do botão. */
+      height: 40px;  /* Altura do botão. */
+      display: flex;  /* Usa flexbox. */
+      justify-content: center;  /* Centraliza conteúdo. */
+      align-items: center;  /* Centraliza verticalmente. */
+    }
+    
+    #send-button:hover {  /* Efeito ao passar o mouse sobre o botão. */
+      background-color: #3a7bc8;  /* Muda a cor de fundo. */
+    }
+    
+    #name-prompt {  /* Estilo do prompt de nome. */
+      position: fixed;  /* Fixa no viewport. */
+      top: 0;  /* Alinha ao topo. */
+      left: 0;  /* Alinha à esquerda. */
+      width: 100%;  /* Largura total. */
+      height: 100%;  /* Altura total. */
+      background-color: rgba(0,0,0,0.5);  /* Fundo semi-transparente. */
+      display: flex;  /* Usa flexbox. */
+      justify-content: center;  /* Centraliza horizontalmente. */
+      align-items: center;  /* Centraliza verticalmente. */
+      z-index: 1000;  /* Camada acima de outros elementos. */
+    }
+    
+    #name-form {  /* Estilo do formulário de nome. */
+      background-color: white;  /* Fundo branco. */
+      padding: 20px;  /* Preenchimento interno. */
+      border-radius: 10px;  /* Bordas arredondadas. */
+      text-align: center;  /* Centraliza texto. */
+      width: 80%;  /* Largura de 80%. */
+      max-width: 300px;  /* Largura máxima de 300px. */
+    }
+    
+    #name-input {  /* Estilo do campo de entrada para o nome. */
+      width: 100%;  /* Largura total. */
+      padding: 10px;  /* Preenchimento interno. */
+      margin: 10px 0;  /* Margem vertical. */
+      border: 1px solid #ccc;  /* Borda cinza. */
+      border-radius: 5px;  /* Bordas arredondadas. */
+      font-size: 16px;  /* Tamanho da fonte. */
+      box-sizing: border-box;  /* Inclui preenchimento e bordas no cálculo da largura. */
+    }
+    
+    #name-submit {  /* Estilo do botão de envio do nome. */
+      background-color: #4a90e2;  /* Cor de fundo azul. */
+      color: white;  /* Cor do texto branca. */
+      border: none;  /* Sem borda. */
+      padding: 10px 20px;  /* Preenchimento interno. */
+      border-radius: 5px;  /* Bordas arredondadas. */
+      cursor: pointer;  /* Muda o cursor ao passar o mouse. */
+      font-size: 16px;  /* Tamanho da fonte. */
+      width: 100%;  /* Largura total. */
+    }
+
+    @media (max-width: 480px) {  /* Regras para telas menores que 480px. */
+      #chat-container {  /* Estilo do contêiner de chat. */
+        height: 100vh;  /* Altura total da tela. */
+        border-radius: 0;  /* Remove bordas arredondadas. */
+      }
+
+      #chat-header {  /* Estilo do cabeçalho do chat. */
+        border-radius: 0;  /* Remove bordas arredondadas. */
+      }
+
+      .message {  /* Estilo das mensagens. */
