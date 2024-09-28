@@ -1,0 +1,89 @@
+import os  # Importa o módulo 'os', que fornece funções para interagir com o sistema operacional.
+import requests  # Importa a biblioteca 'requests', usada para fazer requisições HTTP.
+import tkinter as tk  # Importa o módulo 'tkinter' para criar interfaces gráficas em Python.
+from tkinter import scrolledtext  # Importa 'scrolledtext' para criar áreas de texto com barras de rolagem.
+
+# Substitua pela sua chave da Groq
+GROQ_API_KEY = "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"  # Define a chave da API Groq.
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"  # Define a URL da API Groq.
+
+def query_groq(messages):  # Função para enviar mensagens para a API Groq e obter a resposta.
+    headers = {  # Cabeçalhos da requisição HTTP.
+        "Authorization": f"Bearer {GROQ_API_KEY}",  # Adiciona a chave da API no cabeçalho de autorização.
+        "Content-Type": "application/json"  # Define o tipo de conteúdo como JSON.
+    }
+    data = {  # Dados a serem enviados na requisição.
+        "model": "llama3-8b-8192",  # Modelo a ser utilizado na API.
+        "messages": messages  # Mensagens que serão enviadas para a API.
+    }
+    
+    response = requests.post(GROQ_API_URL, headers=headers, json=data)  # Faz a requisição POST para a API.
+    
+    if response.status_code == 200:  # Verifica se a requisição foi bem-sucedida.
+        return response.json()['choices'][0]['message']['content']  # Retorna o conteúdo da resposta.
+    else:  # Se houve um erro na requisição.
+        return f"Erro: {response.status_code} - {response.text}"  # Retorna a mensagem de erro.
+
+def send_message():  # Função para enviar uma mensagem quando o usuário clicar no botão.
+    user_input = entry.get()  # Obtém o texto digitado pelo usuário no campo de entrada.
+    if user_input:  # Verifica se o usuário digitou algo.
+        chat_area.config(state=tk.NORMAL)  # Habilita a área de texto para edição.
+        chat_area.insert(tk.END, f"{user_name}: {user_input}\n\n")  # Adiciona a mensagem do usuário à área de texto.
+        chat_area.config(state=tk.DISABLED)  # Desabilita a área de texto para evitar edição.
+
+        messages.append({"role": "user", "content": user_input})  # Adiciona a mensagem do usuário à lista de mensagens.
+
+        response = query_groq(messages)  # Chama a função para enviar as mensagens à API e obter a resposta.
+
+        chat_area.config(state=tk.NORMAL)  # Habilita novamente a área de texto.
+        chat_area.insert(tk.END, f"Cael-ia: {response}\n\n")  # Adiciona a resposta do assistente à área de texto.
+        chat_area.config(state=tk.DISABLED)  # Desabilita a área de texto novamente.
+
+        messages.append({"role": "assistant", "content": response})  # Adiciona a resposta do assistente à lista de mensagens.
+        entry.delete(0, tk.END)  # Limpa o campo de entrada para nova mensagem.
+
+def set_user_name():  # Função para definir o nome do usuário.
+    global user_name  # Declara que vamos usar a variável global 'user_name'.
+    user_name = name_entry.get()  # Obtém o nome digitado pelo usuário.
+    if user_name:  # Verifica se o usuário digitou um nome.
+        chat_area.config(state=tk.NORMAL)  # Habilita a área de texto para edição.
+        chat_area.insert(tk.END, f"Cael-ia: Olá, {user_name}! Eu sou uma inteligencia artificial criada por Cael P. Alves. ainda estou em desenvolvimento. Como posso ajudar você hoje?\n\n")  # Mensagem de boas-vindas do assistente.
+        chat_area.config(state=tk.DISABLED)  # Desabilita a área de texto para evitar edição.
+        name_frame.pack_forget()  # Oculta o frame de entrada do nome após a definição do nome.
+
+# Inicializar a lista de mensagens e o nome do usuário
+messages = []  # Lista para armazenar as mensagens trocadas.
+user_name = ""  # Variável para armazenar o nome do usuário.
+
+# Configuração da janela principal
+root = tk.Tk()  # Cria a janela principal da aplicação.
+root.title("Chatbot Interface")  # Define o título da janela.
+
+# Frame para entrada do nome
+name_frame = tk.Frame(root)  # Cria um frame para organizar widgets.
+name_frame.pack(pady=10)  # Adiciona o frame à janela com um espaçamento vertical.
+
+name_label = tk.Label(name_frame, text="Antes de começarmos, por favor me diga seu nome:")  # Cria um rótulo para solicitar o nome do usuário.
+name_label.pack()  # Adiciona o rótulo ao frame.
+
+name_entry = tk.Entry(name_frame)  # Cria um campo de entrada para o nome do usuário.
+name_entry.pack(pady=5)  # Adiciona o campo ao frame com um espaçamento vertical.
+
+name_button = tk.Button(name_frame, text="Enviar", command=set_user_name)  # Cria um botão para enviar o nome do usuário.
+name_button.pack(pady=5)  # Adiciona o botão ao frame.
+
+# Área de texto para exibir o chat
+chat_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED)  # Cria uma área de texto com rolagem, inicialmente desabilitada.
+chat_area.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)  # Adiciona a área de texto à janela, preenchendo o espaço disponível.
+
+# Campo de entrada para o usuário (ajustado para ser mais largo)
+entry = tk.Entry(root, width=120)  # Cria um campo de entrada para mensagens do usuário com largura ajustada.
+entry.pack(pady=10, padx=10)  # Adiciona o campo à janela.
+
+# Botão para enviar a mensagem
+send_button = tk.Button(root, text="Enviar", command=send_message)  # Cria um botão para enviar a mensagem.
+send_button.pack(pady=10)  # Adiciona o botão à janela.
+
+# Iniciar a interface
+root.mainloop()  # Inicia o loop principal da interface gráfica, aguardando interações do usuário.
+Esse código cria uma interface gráfica de chatbot que permite ao usuário se apresentar e trocar mensagens com uma IA usando a API da Groq.
